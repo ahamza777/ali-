@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALI GENERAL STORE</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Segoe UI,sans-serif;background:#f4f6f8;padding-bottom:90px}
+
+/* HEADER */
+header{
+  position:sticky;top:0;
+  background:#1b5e20;color:#fff;
+  padding:15px;text-align:center
+}
+.cart-count{
+  position:absolute;right:20px;top:15px;
+  background:red;color:#fff;
+  padding:6px 12px;border-radius:50%;
+  cursor:pointer;
+}
+
+/* PRODUCTS */
+.products{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:20px;padding:20px
+}
+.product{
+  background:#fff;border-radius:14px;
+  box-shadow:0 8px 20px rgba(0,0,0,.2);
+  overflow:hidden;
+  animation:fadeUp .6s ease both;
+}
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.product img{width:100%;height:160px;object-fit:cover}
+.info{text-align:center;padding:12px}
+
+.add-btn{
+  background:#4caf50;color:#fff;
+  border:none;padding:10px 18px;
+  border-radius:25px;cursor:pointer;
+  transition:.2s;
+}
+.add-btn:active{transform:scale(.9)}
+
+/* CART PANEL */
+#cartPanel{
+  position:fixed;right:-350px;top:0;
+  width:320px;height:100%;
+  background:#fff;
+  box-shadow:-4px 0 15px rgba(0,0,0,.3);
+  padding:15px;
+  z-index:50;overflow-y:auto;
+  transition:.4s ease;
+}
+#cartPanel.show{right:0}
+
+.cart-item{
+  display:flex;justify-content:space-between;
+  align-items:center;margin:10px 0
+}
+.cart-item button{
+  padding:2px 8px;border:none;
+  background:#4caf50;color:#fff;
+  border-radius:4px;cursor:pointer
+}
+.total{font-weight:bold;margin-top:10px}
+
+/* BOTTOM BAR */
+#bottomBar{
+  position:fixed;left:0;right:0;bottom:-100px;
+  background:#1b5e20;color:#fff;
+  display:flex;justify-content:space-between;
+  align-items:center;padding:12px 16px;
+  transition:.4s;font-weight:600;cursor:pointer
+}
+#bottomBar.show{bottom:0}
+#bottomBar button{
+  background:#ff9800;border:none;
+  padding:8px 14px;border-radius:20px;
+  font-weight:bold
+}
+@media(min-width:768px){#bottomBar{display:none}}
+
+/* FLY IMAGE */
+.fly{
+  position:fixed;width:40px;height:40px;
+  border-radius:50%;
+  pointer-events:none;
+  z-index:100;
+  transition:1s cubic-bezier(.2,.8,.2,1);
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h2>ALI GENERAL STORE</h2>
+
+  <input 
+    type="text" 
+    id="searchInput" 
+    placeholder="Search products..." 
+    style="width:90%;margin-top:10px;padding:10px;border-radius:8px;border:none;font-size:15px;"
+  >
+
+  <div class="cart-count" id="cartCount">0</div>
+</header>
+
+<section class="products" id="productList"></section>
+
+<div id="cartPanel">
+  <h3>Your Cart</h3>
+  <div id="cartItems"></div>
+  <div class="total" id="cartTotal"></div>
+
+  <button id="orderBtn"
+   style="margin-top:10px;background:#25d366;color:#fff;border:none;padding:12px;border-radius:8px;width:100%">
+   Place Order on WhatsApp
+  </button>
+
+  <button id="closeCartBtn"
+   style="margin-top:10px;background:#e53935;color:#fff;border:none;padding:10px;border-radius:8px;width:100%">
+   Close Cart
+  </button>
+</div>
+
+<div id="bottomBar">
+  <div id="barText">0 items | ₹0</div>
+  <button>View Cart</button>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+
+const products=[
+ {name:"Soap Powder",price:120,img:"https://images.unsplash.com/photo-1581579185169-7bfe75a5d3fa"},
+ {name:"Shampoo",price:180,img:"https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2"},
+ {name:"Milk Packet",price:60,img:"https://images.unsplash.com/photo-1585238342028-4bbc5e87fa19"}
+];
+
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+const list=document.getElementById("productList");
+const cartCount=document.getElementById("cartCount");
+const cartPanel=document.getElementById("cartPanel");
+const bottomBar=document.getElementById("bottomBar");
+const barText=document.getElementById("barText");
+const searchInput = document.getElementById("searchInput");
+
+/* ================= PRODUCTS RENDER + SEARCH ================= */
+
+function renderProducts(filter=""){
+ list.innerHTML="";
+ products
+  .filter(p=>p.name.toLowerCase().includes(filter.toLowerCase()))
+  .forEach(p=>{
+   const d=document.createElement("div");
+   d.className="product";
+   d.innerHTML=`
+     <img src="${p.img}">
+     <div class="info">
+       <h4>${p.name}</h4>
+       <p>₹${p.price}</p>
+       <button class="add-btn">Add to Cart</button>
+     </div>`;
+   d.querySelector("button").onclick=e=>addToCart(p,e);
+   list.appendChild(d);
+  });
+}
+
+searchInput.addEventListener("input",e=>{
+  renderProducts(e.target.value);
+});
+
+/* ================= CART LOGIC ================= */
+
+function addToCart(p,e){
+ const item=cart.find(i=>i.name===p.name);
+ item ? item.qty++ : cart.push({...p,qty:1});
+ save();
+ flyAnimation(e.target,p.img);
+}
+
+function changeQty(i,d){
+ cart[i].qty+=d;
+ if(cart[i].qty<1) cart[i].qty=1;
+ save();
+}
+
+function save(){
+ localStorage.setItem("cart",JSON.stringify(cart));
+ updateCart();
+}
+
+function updateCart(){
+ const items=cart.reduce((a,b)=>a+b.qty,0);
+ const total=cart.reduce((a,b)=>a+b.qty*b.price,0);
+ cartCount.innerText=items;
+ barText.innerText=`${items} items | ₹${total}`;
+ items?bottomBar.classList.add("show"):bottomBar.classList.remove("show");
+ renderCart();
+}
+
+function renderCart(){
+ const box=document.getElementById("cartItems");
+ box.innerHTML="";
+ cart.forEach((i,idx)=>{
+  box.innerHTML+=`
+   <div class="cart-item">
+    <span>${i.name}</span>
+    <span>
+     <button onclick="changeQty(${idx},-1)">-</button>
+     ${i.qty}
+     <button onclick="changeQty(${idx},1)">+</button>
+     ₹${i.qty*i.price}
+    </span>
+   </div>`;
+ });
+ document.getElementById("cartTotal").innerText=
+  "Total ₹"+cart.reduce((a,b)=>a+b.qty*b.price,0);
+}
+
+/* ================= CART PANEL ================= */
+
+function openCart(){
+ cartPanel.classList.add("show");
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+function closeCart(){
+ cartPanel.classList.remove("show");
+ window.scrollTo({top:list.offsetTop,behavior:"smooth"});
+}
+
+cartCount.onclick=openCart;
+bottomBar.onclick=openCart;
+document.getElementById("closeCartBtn").onclick=closeCart;
+
+/* ================= WHATSAPP ORDER ================= */
+
+document.getElementById("orderBtn").onclick=()=>{
+ if(!cart.length) return alert("Cart empty");
+ let msg="Order:%0A";
+ cart.forEach(i=>msg+=`${i.name} x${i.qty} = ₹${i.qty*i.price}%0A`);
+ window.open(`https://wa.me/919876543210?text=${msg}`);
+};
+
+/* ================= FLY ANIMATION ================= */
+
+function flyAnimation(btn,img){
+ const rect=btn.getBoundingClientRect();
+ const fly=document.createElement("img");
+ fly.src=img;
+ fly.className="fly";
+ fly.style.left=rect.left+"px";
+ fly.style.top=rect.top+"px";
+ document.body.appendChild(fly);
+
+ const cartRect=cartCount.getBoundingClientRect();
+ requestAnimationFrame(()=>{
+  fly.style.left=cartRect.left+"px";
+  fly.style.top=cartRect.top+"px";
+  fly.style.transform="scale(0)";
+  fly.style.opacity=0;
+ });
+ setTimeout(()=>fly.remove(),800);
+}
+
+window.changeQty=changeQty;
+
+/* ================= INIT ================= */
+
+renderProducts();
+updateCart();
+
+});
+</script>
+
+window.changeQty=changeQty;
+
+renderProducts();
+updateCart();
+});
+</script>
+
+</body>
+</html>
