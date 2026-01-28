@@ -2,176 +2,142 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<title>ALI GENERAL STORE PRO</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ALI GENERAL STORE</title>
 
 <style>
+:root{
+ --green:#1b5e20;
+ --neon:#00e676;
+}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Segoe UI,sans-serif;background:#f4f6f8;padding-bottom:90px}
+body{
+ font-family:Segoe UI,sans-serif;
+ background:linear-gradient(135deg,#0f172a,#020617);
+ color:#fff;padding-bottom:110px
+}
 
 /* HEADER */
 header{
-  position:sticky;top:0;
-  background:#1b5e20;color:#fff;
-  padding:15px;text-align:center;
-  box-shadow:0 4px 18px rgba(0,0,0,.35);
-  position:relative;
+ position:sticky;top:0;
+ background:rgba(27,94,32,.85);
+ backdrop-filter:blur(12px);
+ padding:16px;text-align:center;
+ box-shadow:0 10px 40px rgba(0,0,0,.6);
+ z-index:10;
 }
-header::after{
-  content:"";
-  position:absolute;
-  left:0;right:0;bottom:0;height:3px;
-  background:linear-gradient(90deg,#00e676,#66bb6a,#00e676);
-  background-size:200% 100%;
-  animation:headerGlow 3s linear infinite;
-}
-@keyframes headerGlow{
-  0%{background-position:0%}
-  100%{background-position:200%}
-}
-
 .cart-count{
-  position:absolute;right:20px;top:15px;
-  background:red;color:#fff;
-  padding:6px 12px;border-radius:50%;
-  cursor:pointer;
-  animation:pulse 1.6s infinite;
+ position:absolute;right:18px;top:18px;
+ background:red;padding:6px 12px;border-radius:50%;
+ animation:pulse 1.5s infinite;cursor:pointer
 }
 @keyframes pulse{
-  0%{box-shadow:0 0 0 0 rgba(255,0,0,.6)}
-  70%{box-shadow:0 0 0 18px rgba(255,0,0,0)}
-  100%{box-shadow:0 0 0 0 rgba(255,0,0,0)}
+ 0%{box-shadow:0 0 0 0 rgba(255,0,0,.6)}
+ 70%{box-shadow:0 0 0 18px rgba(255,0,0,0)}
 }
+
+/* FILTERS */
+.filters{display:flex;gap:10px;overflow-x:auto;padding:10px;background:#020617}
+.filters button{background:#1e293b;color:#fff;border:none;padding:8px 14px;border-radius:20px}
+.filters button.active{background:var(--neon);color:#000}
 
 /* PRODUCTS */
-.products{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:20px;padding:20px
-}
+.products{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;padding:20px}
 .product{
-  background:#fff;border-radius:14px;
-  box-shadow:0 8px 20px rgba(0,0,0,.2);
-  overflow:hidden;
-  cursor:pointer;
-  transition:.35s cubic-bezier(.4,0,.2,1);
+ background:rgba(255,255,255,.08);
+ backdrop-filter:blur(10px);
+ border-radius:18px;overflow:hidden;
+ box-shadow:0 15px 40px rgba(0,0,0,.6);
+ transition:.4s;position:relative
 }
-.product:hover{
-  transform:translateY(-10px) scale(1.03);
-  box-shadow:0 20px 45px rgba(0,0,0,.4);
-}
-.product img{
-  width:100%;height:160px;object-fit:cover;
-  transition:.4s ease;
-}
-.product:hover img{
-  transform:scale(1.1);
-}
+.product:hover{transform:translateY(-12px) scale(1.04)}
+.badge{position:absolute;top:10px;left:10px;background:#ff1744;padding:4px 10px;border-radius:20px;font-size:12px}
+.product img{width:100%;height:160px;object-fit:cover}
 .info{text-align:center;padding:12px}
-
-/* ADD BUTTON */
 .add-btn{
-  background:#4caf50;color:#fff;
-  border:none;padding:10px 18px;
-  border-radius:25px;cursor:pointer;
-  position:relative;overflow:hidden;
-  transition:.25s ease;
+ background:var(--neon);color:#000;border:none;
+ padding:10px 18px;border-radius:30px;
+ font-weight:bold;cursor:pointer;transition:.25s
 }
-.add-btn:hover{
-  background:#2e7d32;
-  transform:scale(1.08);
-}
-.add-btn::after{
-  content:"";
-  position:absolute;inset:0;
-  background:linear-gradient(120deg,
-    transparent,
-    rgba(255,255,255,.5),
-    transparent);
-  transform:translateX(-100%);
-}
-.add-btn:hover::after{
-  animation:btnShine .6s;
-}
-@keyframes btnShine{
-  to{transform:translateX(100%)}
-}
+.add-btn:hover{transform:scale(1.1)}
 
-/* CART PANEL */
+/* CART PANEL + ANIMATION */
 #cartPanel{
-  position:fixed;right:-350px;top:0;
-  width:320px;height:100%;
-  background:rgba(255,255,255,.95);
-  backdrop-filter:blur(10px);
-  box-shadow:-4px 0 15px rgba(0,0,0,.3);
-  padding:15px;
-  z-index:50;overflow-y:auto;
-  transition:.4s ease;
+ position:fixed;right:-360px;top:0;
+ width:340px;height:100%;
+ background:rgba(15,23,42,.95);
+ backdrop-filter:blur(14px);
+ box-shadow:-6px 0 25px rgba(0,0,0,.7);
+ padding:15px;
+ transition:.5s cubic-bezier(.18,.89,.32,1.28);
+ z-index:50;
 }
-#cartPanel.show{right:0}
+#cartPanel.show{
+ right:0;
+ animation:cartPop .45s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes cartPop{
+ 0%{transform:scale(.9) translateX(60px);opacity:0}
+ 100%{transform:scale(1) translateX(0);opacity:1}
+}
 
 .cart-item{
-  display:flex;justify-content:space-between;
-  align-items:center;margin:10px 0;font-size:14px;
-  animation:cartFade .25s ease;
+ display:flex;justify-content:space-between;
+ margin:10px 0;font-size:14px
 }
-@keyframes cartFade{
-  from{opacity:0;transform:translateX(40px)}
-  to{opacity:1;transform:translateX(0)}
+.cart-item button{
+ border:none;background:#1e293b;color:#fff;
+ border-radius:6px;padding:2px 8px;
+ cursor:pointer;transition:.2s
+}
+.cart-item button:hover{
+ transform:scale(1.2);
+ background:var(--neon);color:#000
 }
 .total{font-weight:bold;margin-top:10px}
 
 /* BOTTOM BAR */
 #bottomBar{
-  position:fixed;left:0;right:0;bottom:-100px;
-  background:#1b5e20;color:#fff;
-  display:flex;justify-content:space-between;
-  align-items:center;padding:12px 16px;
-  transition:.4s;font-weight:600;cursor:pointer;
-  box-shadow:0 -6px 25px rgba(0,0,0,.45);
+ position:fixed;left:0;right:0;bottom:-120px;
+ background:linear-gradient(90deg,#1b5e20,#00e676);
+ color:#000;
+ display:flex;justify-content:space-between;
+ align-items:center;padding:14px 18px;
+ transition:.4s;font-weight:800
 }
-#bottomBar.show{
-  bottom:0;
-  animation:barBounce .5s ease;
-}
-@keyframes barBounce{
-  0%{transform:translateY(100%)}
-  60%{transform:translateY(-12%)}
-  100%{transform:translateY(0)}
-}
+#bottomBar.show{bottom:0}
 
 /* MODAL */
 #productModal{
-  position:fixed;inset:0;
-  background:rgba(0,0,0,.6);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:200;
+ position:fixed;inset:0;background:rgba(0,0,0,.7);
+ display:none;align-items:center;justify-content:center;z-index:200
 }
 #productModal .box{
-  background:#fff;width:90%;max-width:500px;
-  border-radius:14px;overflow:hidden;
-  animation:modalPop .4s cubic-bezier(.34,1.56,.64,1);
+ background:#020617;width:90%;max-width:500px;
+ border-radius:18px;overflow:hidden;
+ animation:pop .4s cubic-bezier(.34,1.56,.64,1)
 }
-@keyframes modalPop{
-  from{transform:scale(.75);opacity:0}
-  to{transform:scale(1);opacity:1}
-}
-#productModal img{
-  width:100%;height:220px;object-fit:cover
-}
+@keyframes pop{from{transform:scale(.7);opacity:0}}
+#productModal img{width:100%;height:220px;object-fit:cover}
 </style>
 </head>
 
 <body>
 
 <header>
-  <h2>ALI GENERAL STORE</h2>
-  <input id="searchInput" placeholder="Search products..."
-   style="width:90%;margin-top:10px;padding:10px;border-radius:8px;border:none">
-  <div class="cart-count" id="cartCount">0</div>
+ <h2>ALI GENERAL STORE PRO</h2>
+ <input id="searchInput" placeholder="Search..."
+ style="width:90%;margin-top:10px;padding:10px;border-radius:10px;border:none">
+ <div class="cart-count" id="cartCount">0</div>
 </header>
+
+<div class="filters">
+ <button class="active" onclick="setCategory('all',this)">All</button>
+ <button onclick="setCategory('grocery',this)">Grocery</button>
+ <button onclick="setCategory('dairy',this)">Dairy</button>
+ <button onclick="setCategory('snacks',this)">Snacks</button>
+ <button onclick="setCategory('personal',this)">Personal Care</button>
+</div>
 
 <section class="products" id="productList"></section>
 
@@ -182,8 +148,8 @@ header::after{
   <div style="padding:15px">
    <h2 id="modalName"></h2>
    <h3 id="modalPrice"></h3>
-   <button id="modalAddBtn" class="add-btn" style="width:100%;margin:10px 0">Add to Cart</button>
-   <button id="modalCloseBtn" style="width:100%;background:#e53935;color:#fff;border:none;padding:10px">Close</button>
+   <button id="modalAddBtn" class="add-btn" style="width:100%">Add to Cart</button>
+   <button id="modalCloseBtn" style="width:100%;margin-top:8px;background:#ff1744;color:#fff;border:none;padding:10px">Close</button>
   </div>
  </div>
 </div>
@@ -193,7 +159,7 @@ header::after{
  <h3>Your Cart</h3>
  <div id="cartItems"></div>
  <div class="total" id="cartTotal"></div>
- <button id="closeCartBtn" style="margin-top:10px;background:#e53935;color:#fff;border:none;padding:10px;width:100%">Close Cart</button>
+ <button id="closeCartBtn" style="margin-top:10px;background:#ff1744;color:#fff;border:none;padding:10px;width:100%">Close</button>
 </div>
 
 <div id="bottomBar">
@@ -202,59 +168,61 @@ header::after{
 </div>
 
 <script>
-/* YOUR ORIGINAL JS — UNCHANGED */
-document.addEventListener("DOMContentLoaded",()=>{
-
 const products=[
- {name:"Soap Powder",price:120,img:"https://images.unsplash.com/photo-1581579185169-7bfe75a5d3fa"},
- {name:"Shampoo",price:180,img:"https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2"},
- {name:"Milk Packet",price:60,img:"https://images.unsplash.com/photo-1585238342028-4bbc5e87fa19"}
+ {name:"Soap Powder",price:120,cat:"grocery",badge:"HOT",img:"https://images.unsplash.com/photo-1581579185169-7bfe75a5d3fa"},
+ {name:"Shampoo",price:180,cat:"personal",badge:"SALE",img:"https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2"},
+ {name:"Milk Packet",price:60,cat:"dairy",badge:"NEW",img:"https://images.unsplash.com/photo-1585238342028-4bbc5e87fa19"},
+ {name:"Bread",price:45,cat:"grocery",img:"https://images.unsplash.com/photo-1549931319-a545dcf3bc73"},
+ {name:"Butter",price:110,cat:"dairy",img:"https://images.unsplash.com/photo-1589987607627-616cacd2d2f1"},
+ {name:"Chips",price:30,cat:"snacks",badge:"HOT",img:"https://images.unsplash.com/photo-1585238341986-5db0c38ab51c"},
+ {name:"Biscuits",price:25,cat:"snacks",img:"https://images.unsplash.com/photo-1589987607891-9f1e2c6a0c5c"},
+ {name:"Toothpaste",price:95,cat:"personal",img:"https://images.unsplash.com/photo-1615484477778-ca3b77940c25"},
 ];
 
-let cart=[];
-let currentProduct=null;
+let cart=JSON.parse(localStorage.getItem("cart")||"[]");
+let currentCat="all",currentProduct=null;
 
-const list=productList;
-const cartCount=document.getElementById("cartCount");
+const list=productList,cartCount=document.getElementById("cartCount");
 const cartPanel=document.getElementById("cartPanel");
 const bottomBar=document.getElementById("bottomBar");
 const barText=document.getElementById("barText");
 const searchInput=document.getElementById("searchInput");
 
-const productModal=document.getElementById("productModal");
-const modalImg=document.getElementById("modalImg");
-const modalName=document.getElementById("modalName");
-const modalPrice=document.getElementById("modalPrice");
-const modalAddBtn=document.getElementById("modalAddBtn");
-const modalCloseBtn=document.getElementById("modalCloseBtn");
+function setCategory(c,btn){
+ currentCat=c;
+ document.querySelectorAll(".filters button").forEach(b=>b.classList.remove("active"));
+ btn.classList.add("active");
+ renderProducts();
+}
 
-const cartItems=document.getElementById("cartItems");
-const cartTotal=document.getElementById("cartTotal");
-const closeCartBtn=document.getElementById("closeCartBtn");
-
-/* PRODUCTS */
-function renderProducts(filter=""){
+function renderProducts(){
  list.innerHTML="";
- products.filter(p=>p.name.toLowerCase().includes(filter.toLowerCase()))
+ products
+ .filter(p=>(currentCat==="all"||p.cat===currentCat))
+ .filter(p=>p.name.toLowerCase().includes(searchInput.value.toLowerCase()))
  .forEach(p=>{
   const d=document.createElement("div");
   d.className="product";
   d.innerHTML=`
+   ${p.badge?`<div class="badge">${p.badge}</div>`:""}
    <img src="${p.img}">
    <div class="info">
     <h4>${p.name}</h4>
     <p>₹${p.price}</p>
-    <button class="add-btn">Add to Cart</button>
+    <button class="add-btn">Add</button>
    </div>`;
   d.querySelector("button").onclick=()=>addToCart(p);
   d.querySelector("img").onclick=()=>openModal(p);
-  d.querySelector("h4").onclick=()=>openModal(p);
   list.appendChild(d);
  });
 }
-searchInput.oninput=e=>renderProducts(e.target.value);
 
 /* MODAL */
+const modalImg=document.getElementById("modalImg");
+const modalName=document.getElementById("modalName");
+const modalPrice=document.getElementById("modalPrice");
+const productModal=document.getElementById("productModal");
+
 function openModal(p){
  currentProduct=p;
  modalImg.src=p.img;
@@ -262,25 +230,30 @@ function openModal(p){
  modalPrice.innerText="₹"+p.price;
  productModal.style.display="flex";
 }
-function closeModal(){ productModal.style.display="none"; }
-modalAddBtn.onclick=()=>{ addToCart(currentProduct); closeModal(); }
-modalCloseBtn.onclick=closeModal;
-productModal.onclick=e=>{ if(e.target===productModal) closeModal(); }
+modalCloseBtn.onclick=()=>productModal.style.display="none";
+modalAddBtn.onclick=()=>{addToCart(currentProduct);productModal.style.display="none"}
 
 /* CART LOGIC */
 function addToCart(p){
- const item=cart.find(i=>i.name===p.name);
- item ? item.qty++ : cart.push({...p,qty:1});
- updateCart();
+ const i=cart.find(x=>x.name===p.name);
+ i?i.qty++:cart.push({...p,qty:1});
+ saveCart();updateCart();
 }
-
-function increaseQty(i){ cart[i].qty++; updateCart(); }
+function increaseQty(i){
+ cart[i].qty++;
+ saveCart();updateCart();
+}
 function decreaseQty(i){
  if(cart[i].qty>1) cart[i].qty--;
  else cart.splice(i,1);
- updateCart();
+ saveCart();updateCart();
 }
-function removeItem(i){ cart.splice(i,1); updateCart(); }
+function removeItem(i){
+ cart.splice(i,1);
+ saveCart();updateCart();
+}
+
+function saveCart(){localStorage.setItem("cart",JSON.stringify(cart))}
 
 function updateCart(){
  const items=cart.reduce((a,b)=>a+b.qty,0);
@@ -299,10 +272,10 @@ function renderCart(){
     <span>${i.name}</span>
     <span>
      <button onclick="decreaseQty(${idx})">-</button>
-     ${i.qty}
+     <b style="margin:0 6px">${i.qty}</b>
      <button onclick="increaseQty(${idx})">+</button>
-     ₹${i.price}
-     <button onclick="removeItem(${idx})" style="background:red;color:#fff;border:none">✕</button>
+     ₹${i.qty*i.price}
+     <button onclick="removeItem(${idx})" style="background:#ff1744;color:#fff">✕</button>
     </span>
    </div>`;
  });
@@ -313,16 +286,9 @@ function renderCart(){
 cartCount.onclick=()=>cartPanel.classList.add("show");
 bottomBar.onclick=()=>cartPanel.classList.add("show");
 closeCartBtn.onclick=()=>cartPanel.classList.remove("show");
+searchInput.oninput=renderProducts;
 
-/* EXPOSE */
-window.increaseQty=increaseQty;
-window.decreaseQty=decreaseQty;
-window.removeItem=removeItem;
-
-renderProducts();
-updateCart();
-
-});
+renderProducts();updateCart();
 </script>
 
 </body>
